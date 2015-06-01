@@ -183,4 +183,25 @@ require([
     editor.getTextView().onModify = function() {
         verify();
     };
+    
+        function getParameterByName(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+          results = regex.exec(location.search);
+        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
+
+    if(getParameterByName('url') !== '') {
+        $.getJSON("http://query.yahooapis.com/v1/public/yql?"+
+          "q=select%20*%20from%20html%20where%20url%3D%22"+
+          encodeURIComponent(getParameterByName('url'))+
+          "%22&format=json",
+          function(data){
+              if(data.query.results.body){
+                  var data = data.query.results.body;
+                  editor.setText(data)
+              }
+          }
+        );
+    }
 });
